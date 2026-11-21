@@ -3,7 +3,14 @@ import { Link } from 'react-router-dom';
 export default function Hero() {
   return (
     <section style={styles.hero}>
-      <svg width="100%" height="100%" viewBox="0 0 900 480" style={styles.waveSvg} preserveAspectRatio="xMidYMid slice">
+      <svg
+        width="100%"
+        height="100%"
+        viewBox="0 0 900 480"
+        style={styles.waveSvg}
+        preserveAspectRatio="xMidYMid slice"
+        aria-hidden="true"
+      >
         <defs>
           <radialGradient id="wave1" cx="30%" cy="60%" r="60%">
             <stop offset="0%" stopColor="#6c5fd6" stopOpacity="0.5" />
@@ -22,23 +29,24 @@ export default function Hero() {
 
       <div style={styles.content}>
         <div style={styles.badge}>
-          <i className="ti ti-sparkles" style={{ fontSize: '13px', color: '#c3bcf5' }}></i>
+          <i className="ti ti-sparkles" style={{ fontSize: '13px', color: '#c3bcf5' }} aria-hidden="true"></i>
           The Future of Business, Today
         </div>
-        <div style={styles.headlineLine}>
-          Find & Create the <span style={styles.gradientText}>Business</span>
-        </div>
-        <div style={styles.headlineLine}>You Were Meant to Start</div>
+        <h1 style={styles.headline}>
+          Find &amp; Create the <span style={styles.gradientText}>Business</span>
+          <br />
+          You Were Meant to Start
+        </h1>
         <p style={styles.subtext}>
           Indigo builds AI-guided ideas, roadmaps, and real numbers, all tailored to you.
         </p>
-        <Link to="/signup" style={styles.pillBtn}>Explore</Link>
+        <Link to="/explore" className="btn btn-pill" style={{ marginBottom: '50px' }}>Explore</Link>
       </div>
 
       <div style={styles.panelsWrap}>
-        <div style={styles.panelsGrid}>
+        <div className="hero-panels">
           <div style={styles.ideasPanel}>
-            <i className="ti ti-bulb" style={styles.ideasIcon}></i>
+            <i className="ti ti-bulb" style={styles.ideasIcon} aria-hidden="true"></i>
             <div>
               <div style={styles.panelTitle}>Ideas for Every Interest</div>
               <Link to="/explore" style={styles.panelChip}>Explore ideas</Link>
@@ -47,7 +55,7 @@ export default function Hero() {
 
           <div style={styles.roadmapPanel}>
             <div style={styles.panelTitle}>Your Roadmap</div>
-            <div style={styles.roadmapSteps}>
+            <div style={styles.roadmapSteps} aria-hidden="true">
               <div style={styles.stepDotFilled}></div>
               <div style={styles.stepDotFilled}></div>
               <div style={styles.stepDotFilled}></div>
@@ -57,7 +65,7 @@ export default function Hero() {
           </div>
 
           <div style={styles.numbersPanel}>
-            <i className="ti ti-bolt" style={styles.numbersIcon}></i>
+            <i className="ti ti-bolt" style={styles.numbersIcon} aria-hidden="true"></i>
             <div style={styles.numbersText}>
               Get <b>real numbers</b> built to launch your idea faster.
             </div>
@@ -68,13 +76,22 @@ export default function Hero() {
   );
 }
 
+const panelBase = {
+  minHeight: '200px',
+  borderRadius: '18px',
+  padding: '20px',
+  display: 'flex',
+  flexDirection: 'column',
+  textAlign: 'left',
+};
+
 const styles = {
   hero: {
     position: 'relative',
     background: '#0a0714',
     borderRadius: '0 0 24px 24px',
     overflow: 'hidden',
-    padding: '50px 24px 0',
+    padding: '50px 20px 0',
   },
   waveSvg: {
     position: 'absolute',
@@ -93,16 +110,16 @@ const styles = {
     display: 'inline-flex',
     alignItems: 'center',
     gap: '7px',
-    color: '#9089b0',
+    color: '#a8a1c2',
     fontSize: '12px',
     fontWeight: '600',
     letterSpacing: '1px',
     textTransform: 'uppercase',
     marginBottom: '22px',
   },
-  headlineLine: {
+  headline: {
     color: '#fff',
-    fontSize: '44px',
+    fontSize: 'clamp(30px, 6.5vw, 44px)',
     fontWeight: '600',
     lineHeight: '1.2',
     fontFamily: 'var(--font-sans)',
@@ -120,41 +137,17 @@ const styles = {
     margin: '22px auto 30px',
     lineHeight: '1.6',
   },
-  pillBtn: {
-    display: 'inline-block',
-    background: 'linear-gradient(135deg,#6c5fd6,#8b7ff0)',
-    color: '#fff',
-    padding: '12px 30px',
-    borderRadius: '999px',
-    fontSize: '14px',
-    fontWeight: '600',
-    textDecoration: 'none',
-    marginBottom: '50px',
-  },
-
   panelsWrap: {
     position: 'relative',
     zIndex: 2,
     padding: '0 0 24px',
   },
-  panelsGrid: {
-    display: 'grid',
-    gridTemplateColumns: '1.3fr 1fr 1fr',
-    gap: '14px',
-    maxWidth: '820px',
-    margin: '0 auto',
-  },
   ideasPanel: {
+    ...panelBase,
     position: 'relative',
-    height: '220px',
-    borderRadius: '18px',
     background: 'linear-gradient(160deg,#2b2560,#12102b)',
     border: '1px solid rgba(129,140,248,0.3)',
-    padding: '20px',
-    display: 'flex',
-    flexDirection: 'column',
     justifyContent: 'space-between',
-    textAlign: 'left',
   },
   ideasIcon: {
     fontSize: '30px',
@@ -172,19 +165,14 @@ const styles = {
     backdropFilter: 'blur(6px)',
     WebkitBackdropFilter: 'blur(6px)',
     color: '#fff',
-    fontSize: '10.5px',
+    fontSize: '11px',
     padding: '6px 13px',
     borderRadius: '999px',
     textDecoration: 'none',
   },
   roadmapPanel: {
-    height: '220px',
-    borderRadius: '18px',
+    ...panelBase,
     background: 'linear-gradient(155deg,#5648b8,#232066)',
-    padding: '20px',
-    display: 'flex',
-    flexDirection: 'column',
-    textAlign: 'left',
   },
   roadmapSteps: {
     flex: 1,
@@ -211,14 +199,9 @@ const styles = {
     textAlign: 'center',
   },
   numbersPanel: {
-    height: '220px',
-    borderRadius: '18px',
+    ...panelBase,
     background: 'linear-gradient(155deg,#3d3878,#171334)',
-    padding: '20px',
-    display: 'flex',
-    flexDirection: 'column',
     justifyContent: 'space-between',
-    textAlign: 'left',
   },
   numbersIcon: {
     fontSize: '20px',

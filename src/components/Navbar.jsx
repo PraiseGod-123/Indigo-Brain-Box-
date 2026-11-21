@@ -1,84 +1,86 @@
-import { Link } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { Link, NavLink } from 'react-router-dom';
 import Logo from './Logo';
 
+const links = [
+  { to: '/', label: 'Home', end: true },
+  { to: '/about', label: 'About' },
+  { to: '/explore', label: 'Explore ideas' },
+  { to: '/how-it-works', label: 'How it works' },
+  { to: '/pricing', label: 'Pricing' },
+  { to: '/blog', label: 'Blog' },
+  { to: '/contact', label: 'Contact' },
+];
+
+const navClass = ({ isActive }) => `nav-link${isActive ? ' active' : ''}`;
 
 export default function Navbar() {
+  const [open, setOpen] = useState(false);
+  const close = () => setOpen(false);
+
+  // Lock page scroll while the mobile menu is open; close it with Escape.
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e) => e.key === 'Escape' && setOpen(false);
+    document.body.style.overflow = 'hidden';
+    window.addEventListener('keydown', onKey);
+    return () => {
+      document.body.style.overflow = '';
+      window.removeEventListener('keydown', onKey);
+    };
+  }, [open]);
+
   return (
-    <nav style={styles.nav}>
-      <Link to="/" style={styles.brandLink}>
+    <header className="nav">
+      <Link to="/" className="nav-brand" aria-label="Indigo Brain Box home" onClick={close}>
         <Logo fontSize={22} showTagline={true} layout="beside" />
       </Link>
 
-      <div style={styles.links}>
-        <Link to="/" style={styles.navLink}>Home</Link>
-        <Link to="/about" style={styles.navLink}>About</Link>
-        <Link to="/blog" style={styles.navLink}>Blog</Link>
-        <Link to="/contact" style={styles.navLink}>Contact</Link>
-        <Link to="/explore" style={styles.navLink}>Explore ideas</Link>
-        <Link to="/pricing" style={styles.navLink}>Pricing</Link>
-        <Link to="/how-it-works" style={styles.navLink}>How it works</Link>
+      <nav aria-label="Main">
+        <ul className="nav-links">
+          {links.map((l) => (
+            <li key={l.to}>
+              <NavLink to={l.to} end={l.end} className={navClass}>
+                {l.label}
+              </NavLink>
+            </li>
+          ))}
+        </ul>
+      </nav>
+
+      <div className="nav-actions">
+        <Link to="/login" className="btn btn-outline btn-sm">Log in</Link>
+        <Link to="/signup" className="btn btn-primary btn-sm">Get started</Link>
       </div>
 
-      <div style={styles.actions}>
-        <Link to="/login" style={styles.loginBtn}>Log in</Link>
-        <Link to="/signup" style={styles.ctaBtn}>Get started</Link>
+      <button
+        type="button"
+        className="nav-toggle"
+        aria-label={open ? 'Close menu' : 'Open menu'}
+        aria-expanded={open}
+        aria-controls="mobile-menu"
+        onClick={() => setOpen((o) => !o)}
+      >
+        <i className={`ti ${open ? 'ti-x' : 'ti-menu-2'}`} aria-hidden="true"></i>
+      </button>
+
+      <div id="mobile-menu" className={`nav-mobile${open ? ' open' : ''}`} inert={!open}>
+        <nav aria-label="Mobile">
+          <ul>
+            {links.map((l) => (
+              <li key={l.to}>
+                <NavLink to={l.to} end={l.end} className={navClass} onClick={close}>
+                  {l.label}
+                </NavLink>
+              </li>
+            ))}
+          </ul>
+        </nav>
+        <div className="nav-mobile-actions">
+          <Link to="/login" className="btn btn-outline btn-block" onClick={close}>Log in</Link>
+          <Link to="/signup" className="btn btn-primary btn-block" onClick={close}>Get started</Link>
+        </div>
       </div>
-    </nav>
+    </header>
   );
 }
-
-const styles = {
-  nav: {
-    position: 'sticky',
-    top: 0,
-    zIndex: 10,
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: '16px 36px',
-    borderBottom: '0.5px solid rgba(255,255,255,0.06)',
-    background: 'rgba(0,0,0,0.15)',
-    backdropFilter: 'blur(8px)',
-  },
-  brandLink: {
-    textDecoration: 'none',
-  },
-  links: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '22px',
-    color: 'var(--color-text-secondary)',
-    fontSize: '13.5px',
-  },
-  navLink: {
-    color: 'inherit',
-    textDecoration: 'none',
-  },
-  actions: {
-    display: 'flex',
-    gap: '10px',
-  },
-  loginBtn: {
-    background: 'transparent',
-    color: 'var(--color-text-primary)',
-    border: '0.5px solid var(--color-border)',
-    padding: '8px 16px',
-    borderRadius: '8px',
-    fontSize: '13px',
-    cursor: 'pointer',
-    textDecoration: 'none',
-    display: 'inline-block',
-  },
-  ctaBtn: {
-    background: 'var(--color-accent)',
-    color: '#fff',
-    border: 'none',
-    padding: '8px 16px',
-    borderRadius: '8px',
-    fontSize: '13px',
-    fontWeight: '500',
-    cursor: 'pointer',
-    textDecoration: 'none',
-    display: 'inline-block',
-  },
-};

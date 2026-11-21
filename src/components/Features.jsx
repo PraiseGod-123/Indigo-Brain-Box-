@@ -1,3 +1,4 @@
+// Not used on any page right now. Kept for the logged-in main page (Step 4).
 const features = [
   {
     icon: 'ti-bulb',
@@ -22,10 +23,10 @@ const features = [
 export default function Features() {
   return (
     <section style={styles.section}>
-      <div style={styles.grid}>
-        {features.map((f, i) => (
-          <div key={i} style={styles.card}>
-            <i className={`ti ${f.icon}`} style={{ ...styles.icon, color: f.color }}></i>
+      <div className="ideas-grid">
+        {features.map((f) => (
+          <div key={f.title} style={styles.card}>
+            <i className={`ti ${f.icon}`} style={{ ...styles.icon, color: f.color }} aria-hidden="true"></i>
             <h3 style={styles.title}>{f.title}</h3>
             <p style={styles.description}>{f.description}</p>
           </div>
@@ -37,23 +38,17 @@ export default function Features() {
 
 const styles = {
   section: {
-    padding: '0 40px 40px',
+    padding: '0 var(--page-x) 40px',
     maxWidth: '1100px',
     margin: '0 auto',
   },
-  grid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(3, 1fr)',
-    gap: '20px',
-  },
- card: {
+  card: {
     background: 'rgba(255,255,255,0.055)',
     border: '1px solid rgba(255,255,255,0.14)',
     borderRadius: '14px',
     padding: '28px 24px',
     textAlign: 'left',
     boxShadow: '0 8px 24px rgba(0,0,0,0.25)',
-    transition: 'transform 0.15s ease, border-color 0.15s ease',
   },
   icon: {
     fontSize: '24px',

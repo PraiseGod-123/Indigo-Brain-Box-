@@ -3,6 +3,8 @@ export default function Logo({ fontSize = 34, showTagline = false, layout = 'sta
 
   const wordmark = (
     <div
+      role="img"
+      aria-label="Indigo"
       style={{
         display: 'inline-flex',
         alignItems: 'baseline',
@@ -14,8 +16,9 @@ export default function Logo({ fontSize = 34, showTagline = false, layout = 'sta
         lineHeight: 1,
       }}
     >
-      <span>Ind</span>
+      <span aria-hidden="true">Ind</span>
       <span
+        aria-hidden="true"
         style={{
           position: 'relative',
           display: 'inline-block',
@@ -48,7 +51,7 @@ export default function Logo({ fontSize = 34, showTagline = false, layout = 'sta
           <circle cx="10" cy="9" r="3.6" fill="var(--color-accent-light)" />
         </svg>
       </span>
-      <span>go</span>
+      <span aria-hidden="true">go</span>
     </div>
   );
 
@@ -66,6 +69,7 @@ export default function Logo({ fontSize = 34, showTagline = false, layout = 'sta
             fontSize: `${fontSize * 0.5}px`,
             letterSpacing: '0.5px',
             fontWeight: 300,
+            whiteSpace: 'nowrap',
           }}
         >
           Brain Box

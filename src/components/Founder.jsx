@@ -1,71 +1,93 @@
 import { useState } from 'react';
+import StarField from './StarField';
+import { site, activeSocials } from '../config/site';
 
 export default function Founder() {
   const [slide, setSlide] = useState(0);
+  const { founder } = site;
+  const socials = activeSocials(founder.socials);
 
   return (
-    <section style={styles.section}>
-      <svg width="100%" height="100%" style={styles.stars}>
-        <circle cx="6%" cy="10%" r="1" fill="#fff" opacity="0.4" />
-        <circle cx="94%" cy="88%" r="0.8" fill="#fff" opacity="0.3" />
-      </svg>
+    <section id="founder" style={styles.section} aria-roledescription="carousel" aria-label="Meet the founder">
+      <StarField count={2} />
 
-      <div
-        style={{
-          ...styles.slidesWrap,
-          transform: `translateX(${-slide * 50}%)`,
-        }}
-      >
+      <div style={{ ...styles.slidesWrap, transform: `translateX(${-slide * 50}%)` }}>
         {/* Slide 1: name + photo */}
-        <div style={styles.slide}>
-          <div style={styles.textCol}>
+        <div className="founder-slide" inert={slide !== 0} aria-hidden={slide !== 0}>
+          <div className="founder-text-col">
             <div style={styles.eyebrow}>Meet the founder</div>
-            <div style={styles.name}>P.U.O</div>
-            <div style={styles.title}>FOUNDER &amp; CEO</div>
+            <div style={styles.name}>{founder.name}</div>
+            <div style={styles.title}>{founder.role.toUpperCase()}</div>
           </div>
-          <div style={styles.photoCol}>
-            <img src="/coverup.jpg" alt="Founder" style={styles.photoImg} />
+          <div className="founder-photo-col">
+            <img src={founder.photo} alt={`${founder.name}, ${founder.role}`} style={styles.photoImg} loading="lazy" />
           </div>
         </div>
 
         {/* Slide 2: bio */}
-        <div style={styles.bioSlide}>
+        <div style={styles.bioSlide} inert={slide !== 1} aria-hidden={slide !== 1}>
           <div style={styles.bioContent}>
             <div style={styles.eyebrow}>About the founder</div>
-            <i className="ti ti-quote" style={styles.quoteIcon}></i>
-            <div style={styles.bioText}>
-              She is a young female computer science graduate.
-            </div>
-            <div style={styles.socialRow}>
-              <a href="#" style={styles.socialIcon}>
-                <i className="ti ti-brand-x" style={{ fontSize: '13px' }}></i>
-              </a>
-              <a href="#" style={styles.socialIcon}>
-                <i className="ti ti-brand-linkedin" style={{ fontSize: '13px' }}></i>
-              </a>
-            </div>
+            <i className="ti ti-quote" style={styles.quoteIcon} aria-hidden="true"></i>
+            <p style={styles.bioText}>{founder.bio}</p>
+            {socials.length > 0 && (
+              <div style={styles.socialRow}>
+                {socials.map((s) => (
+                  <a
+                    key={s.key}
+                    href={s.url}
+                    className="social-icon"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={`${founder.name} on ${s.label}`}
+                  >
+                    <i className={`ti ${s.icon}`} style={{ fontSize: '13px' }} aria-hidden="true"></i>
+                  </a>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </div>
 
       <div style={styles.dots}>
-        <div onClick={() => setSlide(0)} style={slide === 0 ? styles.dotActive : styles.dot}></div>
-        <div onClick={() => setSlide(1)} style={slide === 1 ? styles.dotActive : styles.dot}></div>
+        {[0, 1].map((i) => (
+          <button
+            key={i}
+            type="button"
+            className="slider-dot"
+            onClick={() => setSlide(i)}
+            aria-label={`Show slide ${i + 1} of 2`}
+            aria-current={slide === i}
+            style={{
+              width: slide === i ? '18px' : '6px',
+              background: slide === i ? '#c3bcf5' : 'rgba(255,255,255,0.25)',
+            }}
+          />
+        ))}
       </div>
 
-      {slide === 0 && (
-        <div onClick={() => setSlide(1)} style={styles.navArrowRight}>
-          <i className="ti ti-chevron-right" style={{ fontSize: '16px', color: '#fff' }}></i>
-        </div>
-      )}
-      {slide === 1 && (
-        <div onClick={() => setSlide(0)} style={styles.navArrowLeft}>
-          <i className="ti ti-chevron-left" style={{ fontSize: '16px', color: '#fff' }}></i>
-        </div>
-      )}
+      <button
+        type="button"
+        className="icon-btn"
+        onClick={() => setSlide(slide === 0 ? 1 : 0)}
+        aria-label={slide === 0 ? 'Next slide' : 'Previous slide'}
+        style={slide === 0 ? styles.navArrowRight : styles.navArrowLeft}
+      >
+        <i className={`ti ${slide === 0 ? 'ti-chevron-right' : 'ti-chevron-left'}`} style={{ fontSize: '16px' }} aria-hidden="true"></i>
+      </button>
     </section>
   );
 }
+
+const arrowBase = {
+  position: 'absolute',
+  top: '50%',
+  transform: 'translateY(-50%)',
+  width: '36px',
+  height: '36px',
+  zIndex: 2,
+};
 
 const styles = {
   section: {
@@ -73,11 +95,7 @@ const styles = {
     background: '#000',
     overflow: 'hidden',
     minHeight: '440px',
-  },
-  stars: {
-    position: 'absolute',
-    inset: 0,
-    zIndex: 0,
+    scrollMarginTop: '70px',
   },
   slidesWrap: {
     position: 'relative',
@@ -86,26 +104,15 @@ const styles = {
     transition: 'transform 0.6s cubic-bezier(0.65,0,0.35,1)',
     zIndex: 1,
   },
-  slide: {
-    width: '50%',
-    display: 'flex',
-    alignItems: 'center',
-    minHeight: '440px',
-  },
-  textCol: {
-    flex: 1,
-    padding: '0 20px 0 48px',
-    textAlign: 'left',
-  },
   eyebrow: {
-    color: '#8b86a0',
+    color: 'var(--color-text-faint)',
     fontSize: '11px',
     letterSpacing: '1px',
     textTransform: 'uppercase',
     marginBottom: '16px',
   },
   name: {
-    color: 'rgba(255,255,255,0.35)',
+    color: 'rgba(255,255,255,0.55)',
     fontStyle: 'italic',
     fontSize: '28px',
     fontWeight: '500',
@@ -119,22 +126,17 @@ const styles = {
     fontWeight: '500',
     letterSpacing: '0.5px',
   },
-  photoCol: {
-    flex: '1.5',
-    maxWidth: '480px',
-    height: '400px',
-    position: 'relative',
-    overflow: 'hidden',
-  },
   photoImg: {
     width: '100%',
     height: '100%',
     objectFit: 'cover',
     objectPosition: 'center 15%',
     display: 'block',
-    WebkitMaskImage: 'linear-gradient(to right, transparent 0%, rgba(0,0,0,0.5) 12%, black 30%), radial-gradient(ellipse at center, black 55%, transparent 85%)',
+    WebkitMaskImage:
+      'linear-gradient(to right, transparent 0%, rgba(0,0,0,0.5) 12%, black 30%), radial-gradient(ellipse at center, black 55%, transparent 85%)',
     WebkitMaskComposite: 'source-in',
-    maskImage: 'linear-gradient(to right, transparent 0%, rgba(0,0,0,0.5) 12%, black 30%), radial-gradient(ellipse at center, black 55%, transparent 85%)',
+    maskImage:
+      'linear-gradient(to right, transparent 0%, rgba(0,0,0,0.5) 12%, black 30%), radial-gradient(ellipse at center, black 55%, transparent 85%)',
     maskComposite: 'intersect',
   },
   bioSlide: {
@@ -151,7 +153,7 @@ const styles = {
   },
   quoteIcon: {
     fontSize: '22px',
-    color: '#3a3560',
+    color: '#5a5390',
     marginBottom: '16px',
     display: 'block',
   },
@@ -166,18 +168,6 @@ const styles = {
     justifyContent: 'center',
     gap: '10px',
   },
-  socialIcon: {
-    width: '30px',
-    height: '30px',
-    borderRadius: '8px',
-    background: 'rgba(255,255,255,0.06)',
-    border: '1px solid rgba(255,255,255,0.1)',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    color: '#c9c5db',
-    textDecoration: 'none',
-  },
   dots: {
     position: 'absolute',
     bottom: '20px',
@@ -187,52 +177,6 @@ const styles = {
     gap: '8px',
     zIndex: 2,
   },
-  dot: {
-    width: '6px',
-    height: '6px',
-    borderRadius: '50%',
-    background: 'rgba(255,255,255,0.25)',
-    cursor: 'pointer',
-    transition: 'all 0.25s ease',
-  },
-  dotActive: {
-    width: '18px',
-    height: '6px',
-    borderRadius: '3px',
-    background: '#c3bcf5',
-    cursor: 'pointer',
-    transition: 'all 0.25s ease',
-  },
-  navArrowRight: {
-    position: 'absolute',
-    right: '16px',
-    top: '50%',
-    transform: 'translateY(-50%)',
-    width: '36px',
-    height: '36px',
-    borderRadius: '50%',
-    background: 'rgba(255,255,255,0.08)',
-    border: '1px solid rgba(255,255,255,0.15)',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    cursor: 'pointer',
-    zIndex: 2,
-  },
-  navArrowLeft: {
-    position: 'absolute',
-    left: '16px',
-    top: '50%',
-    transform: 'translateY(-50%)',
-    width: '36px',
-    height: '36px',
-    borderRadius: '50%',
-    background: 'rgba(255,255,255,0.08)',
-    border: '1px solid rgba(255,255,255,0.15)',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    cursor: 'pointer',
-    zIndex: 2,
-  },
+  navArrowRight: { ...arrowBase, right: '16px' },
+  navArrowLeft: { ...arrowBase, left: '16px' },
 };

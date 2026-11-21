@@ -12,18 +12,14 @@ export default function Discover() {
   const sectionRef = useRef(null);
   const [visible, setVisible] = useState(false);
   const [activeTag, setActiveTag] = useState(null); // nothing selected until user taps
-  const hasPlayedRef = useRef(false);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting && !hasPlayedRef.current) {
-            hasPlayedRef.current = true;
-            setVisible(true);
-            observer.disconnect();
-          }
-        });
+        if (entries.some((entry) => entry.isIntersecting)) {
+          setVisible(true);
+          observer.disconnect();
+        }
       },
       { threshold: 0.3 }
     );
@@ -31,56 +27,16 @@ export default function Discover() {
     return () => observer.disconnect();
   }, []);
 
+  // Tapping the active tag again clears the filter.
+  const toggleTag = (tag) => setActiveTag((current) => (current === tag ? null : tag));
+
   return (
     <section ref={sectionRef} style={styles.section}>
-      <style>{`
-        .discoverTag {
-          background: rgba(255,255,255,0.06);
-          color: #c9c5db;
-          border: 0.5px solid rgba(255,255,255,0.14);
-          font-size: 14px;
-          padding: 9px 20px;
-          border-radius: 999px;
-          cursor: pointer;
-          transition: all 0.25s ease;
-        }
-        .discoverTag:hover {
-          background: rgba(255,255,255,0.12);
-          color: #fff;
-          transform: translateY(-2px);
-        }
-        .discoverTag.active {
-          background: linear-gradient(135deg,#6c5fd6,#378ADD);
-          color: #fff;
-          font-weight: 600;
-          box-shadow: 0 4px 16px rgba(108,95,214,0.5);
-          border-color: transparent;
-        }
-        .discoverCard {
-          background: linear-gradient(160deg,#232066,#12102b);
-          border: 1px solid rgba(129,140,248,0.35);
-          border-radius: 18px;
-          padding: 24px;
-          width: 190px;
-          text-align: left;
-          box-shadow: 0 14px 30px rgba(76,63,180,0.35);
-          transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease;
-          cursor: pointer;
-        }
-        .discoverCard:hover {
-          transform: scale(1.07) rotate(0deg) translateY(-8px) !important;
-          box-shadow: 0 24px 44px rgba(76,63,180,0.6);
-        }
-        .discoverCard.dimmed {
-          opacity: 0.3;
-        }
-      `}</style>
-
-      <div style={styles.glow}></div>
+      <div style={styles.glow} aria-hidden="true"></div>
 
       <div style={fadeStyle(visible, 0)}>
         <div style={styles.badge}>
-          <i className="ti ti-bulb" style={{ fontSize: '12px' }}></i> 1000+ ideas waiting
+          <i className="ti ti-bulb" style={{ fontSize: '12px' }} aria-hidden="true"></i> 1000+ ideas waiting
         </div>
       </div>
 
@@ -89,15 +45,17 @@ export default function Discover() {
         Pick what excites you, we'll surface ideas built for it
       </p>
 
-      <div style={{ ...styles.tags, ...fadeStyle(visible, 390) }}>
+      <div style={{ ...styles.tags, ...fadeStyle(visible, 390) }} role="group" aria-label="Filter by interest">
         {interests.map((tag) => (
-          <span
+          <button
             key={tag}
-            onClick={() => setActiveTag(tag)}
-            className={`discoverTag ${tag === activeTag ? 'active' : ''}`}
+            type="button"
+            onClick={() => toggleTag(tag)}
+            className="discover-tag"
+            aria-pressed={tag === activeTag}
           >
             {tag}
-          </span>
+          </button>
         ))}
       </div>
 
@@ -105,13 +63,11 @@ export default function Discover() {
         {ideas.map((idea) => (
           <div
             key={idea.title}
-            className={`discoverCard ${activeTag && idea.category !== activeTag ? 'dimmed' : ''}`}
-            style={{
-              transform: `rotate(${idea.rotate}deg) translateY(${idea.lift}px)`,
-            }}
+            className={`discover-card${activeTag && idea.category !== activeTag ? ' dimmed' : ''}`}
+            style={{ transform: `rotate(${idea.rotate}deg) translateY(${idea.lift}px)` }}
           >
             <div style={styles.iconChip}>
-              <i className={`ti ${idea.icon}`} style={styles.icon}></i>
+              <i className={`ti ${idea.icon}`} style={styles.icon} aria-hidden="true"></i>
             </div>
             <div style={styles.cardTitle}>{idea.title}</div>
             <div style={styles.cardSector}>{idea.sector}</div>
@@ -133,7 +89,7 @@ function fadeStyle(visible, delayMs) {
 const styles = {
   section: {
     position: 'relative',
-    padding: '90px 32px 70px',
+    padding: '90px 20px 70px',
     textAlign: 'center',
     overflow: 'hidden',
   },
@@ -162,7 +118,7 @@ const styles = {
   },
   title: {
     fontFamily: 'var(--font-serif)',
-    fontSize: '36px',
+    fontSize: 'clamp(28px, 6vw, 36px)',
     fontWeight: '500',
     marginBottom: '10px',
     color: '#fff',
@@ -187,6 +143,7 @@ const styles = {
   cardRow: {
     display: 'flex',
     justifyContent: 'center',
+    alignItems: 'center',
     gap: '22px',
     flexWrap: 'wrap',
     maxWidth: '680px',
@@ -216,7 +173,7 @@ const styles = {
     lineHeight: '1.3',
   },
   cardSector: {
-    color: '#9089b0',
+    color: '#a8a1c2',
     fontSize: '13px',
   },
 };
