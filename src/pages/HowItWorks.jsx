@@ -1,13 +1,12 @@
 import { Link } from 'react-router-dom';
-
-
+import StarField from '../components/StarField';
 
 const steps = [
   {
     num: '1',
     label: 'Tell us your interests',
     title: 'What do you actually enjoy?',
-    text: 'Pick what excites you, cooking, tech, wellness, whatever it is. No business background needed.',
+    text: 'Pick what excites you: cooking, tech, wellness, whatever it is. No business background needed.',
   },
   {
     num: '2',
@@ -33,79 +32,62 @@ const steps = [
 export default function HowItWorks() {
   return (
     <>
-      <section style={styles.hero}>
-        <svg width="100%" height="100%" style={styles.stars}>
-          <circle cx="8%" cy="10%" r="1.1" fill="#fff" opacity="0.6" />
-          <circle cx="92%" cy="15%" r="1" fill="#fff" opacity="0.5" />
-        </svg>
-        <div style={styles.heroContent}>
-          <h1 style={styles.heroTitle}>How it works</h1>
-          <p style={styles.heroSubtitle}>From "I have no idea" to a real plan, in four steps.</p>
-        </div>
+      <section className="page-hero" style={{ paddingBottom: '50px' }}>
+        <StarField count={2} />
+        <h1 className="page-hero-title">How it works</h1>
+        <p className="page-hero-subtitle">From "I have no idea" to a real plan, in four steps.</p>
       </section>
 
-      <section style={styles.timelineSection}>
+      <section className="page-section">
         <div style={styles.timelineWrap}>
-          <div style={styles.line}></div>
-
+          <div style={styles.line} aria-hidden="true"></div>
+          <ol style={{ listStyle: 'none' }}>
           {steps.map((step, i) => (
-            <div
+            <li
               key={step.num}
-              style={{
-                ...styles.step,
-                paddingBottom: i === steps.length - 1 ? 0 : '48px',
-              }}
+              style={{ ...styles.step, paddingBottom: i === steps.length - 1 ? 0 : '48px' }}
             >
-              <div style={step.final ? styles.dotFinal : styles.dot}>{step.num}</div>
-              <div style={step.final ? styles.labelFinal : styles.label}>{step.label}</div>
-              <div style={styles.stepTitle}>{step.title}</div>
-              <div style={styles.stepText}>{step.text}</div>
-            </div>
+              <div style={step.final ? styles.dotFinal : styles.dot} aria-hidden="true">{step.num}</div>
+              <div style={{ ...styles.label, color: step.final ? '#a79df5' : '#8b7ff0' }}>{step.label}</div>
+              <h2 style={styles.stepTitle}>{step.title}</h2>
+              <p style={styles.stepText}>{step.text}</p>
+            </li>
           ))}
+          </ol>
         </div>
       </section>
 
       <section style={styles.closing}>
-        <div style={styles.closingTitle}>Ready to find your idea?</div>
-        <div style={styles.closingSubtext}>It takes less time than deciding what to have for dinner.</div>
-        <Link to="/signup" style={styles.closingBtn}>Get started</Link>
+        <h2 style={styles.closingTitle}>Ready to find your idea?</h2>
+        <p style={styles.closingSubtext}>It takes less time than deciding what to have for dinner.</p>
+        <Link to="/signup" className="btn btn-primary">Get started</Link>
       </section>
     </>
   );
 }
 
-const styles = {
-  hero: {
-    position: 'relative',
-    background: '#000',
-    padding: '70px 44px 50px',
-    overflow: 'hidden',
-    textAlign: 'center',
-  },
-  stars: { position: 'absolute', inset: 0 },
-  heroContent: { position: 'relative' },
-  heroTitle: {
-    color: '#fff',
-    fontSize: '32px',
-    fontWeight: '500',
-    fontFamily: 'var(--font-serif)',
-    marginBottom: '12px',
-  },
-  heroSubtitle: {
-    color: 'var(--color-text-secondary)',
-    fontSize: '14.5px',
-  },
+const dotBase = {
+  position: 'absolute',
+  left: '-52px',
+  top: 0,
+  width: '40px',
+  height: '40px',
+  borderRadius: '50%',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  fontSize: '14px',
+  fontWeight: '600',
+  fontFamily: 'var(--font-serif)',
+};
 
-  timelineSection: {
-    position: 'relative',
-    background: '#000',
-    padding: '20px 44px 80px',
-  },
+const styles = {
   timelineWrap: {
     position: 'relative',
     maxWidth: '560px',
     margin: '0 auto',
     paddingLeft: '52px',
+    listStyle: 'none',
   },
   line: {
     position: 'absolute',
@@ -119,49 +101,18 @@ const styles = {
     position: 'relative',
   },
   dot: {
-    position: 'absolute',
-    left: '-52px',
-    top: 0,
-    width: '40px',
-    height: '40px',
-    borderRadius: '50%',
+    ...dotBase,
     background: '#12102b',
     border: '2px solid #6c5fd6',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
     color: '#c3bcf5',
-    fontSize: '14px',
-    fontWeight: '600',
-    fontFamily: 'var(--font-serif)',
   },
   dotFinal: {
-    position: 'absolute',
-    left: '-52px',
-    top: 0,
-    width: '40px',
-    height: '40px',
-    borderRadius: '50%',
+    ...dotBase,
     background: '#6c5fd6',
     border: '2px solid #8b7ff0',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
     color: '#fff',
-    fontSize: '14px',
-    fontWeight: '600',
-    fontFamily: 'var(--font-serif)',
   },
   label: {
-    color: '#6c5fd6',
-    fontSize: '11px',
-    fontWeight: '600',
-    textTransform: 'uppercase',
-    letterSpacing: '0.5px',
-    marginBottom: '6px',
-  },
-  labelFinal: {
-    color: '#8b7ff0',
     fontSize: '11px',
     fontWeight: '600',
     textTransform: 'uppercase',
@@ -177,11 +128,10 @@ const styles = {
     lineHeight: '1.3',
   },
   stepText: {
-    color: '#8b86a0',
+    color: 'var(--color-text-faint)',
     fontSize: '13px',
     lineHeight: '1.65',
   },
-
   closing: {
     position: 'relative',
     background: '#171334',
@@ -199,17 +149,5 @@ const styles = {
     color: 'var(--color-text-secondary)',
     fontSize: '13px',
     marginBottom: '18px',
-  },
-  closingBtn: {
-    background: 'var(--color-accent)',
-    color: '#fff',
-    border: 'none',
-    padding: '10px 22px',
-    borderRadius: '9px',
-    fontSize: '13px',
-    fontWeight: '500',
-    cursor: 'pointer',
-    textDecoration: 'none',
-    display: 'inline-block',
   },
 };

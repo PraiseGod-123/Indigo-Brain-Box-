@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
 import Hero from '../components/Hero';
-
 import Discover from '../components/Discover';
 import Roadmap from '../components/Roadmap';
 import Closing from '../components/Closing';
@@ -43,7 +42,6 @@ export default function Home() {
 
       <div data-id="hero" ref={(el) => (refs.current.hero = el)} className="snap-section">
         <Hero />
-        
       </div>
 
       <div data-id="discover" ref={(el) => (refs.current.discover = el)} className="snap-section">

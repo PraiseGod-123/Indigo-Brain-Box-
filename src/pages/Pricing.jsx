@@ -1,5 +1,9 @@
+import { Link } from 'react-router-dom';
+import StarField from '../components/StarField';
+
 const plans = [
   {
+    id: 'free',
     name: 'Free',
     price: '$0',
     period: 'forever',
@@ -7,6 +11,7 @@ const plans = [
     highlighted: false,
   },
   {
+    id: 'starter',
     name: 'Starter',
     price: '$9',
     period: '/month',
@@ -14,6 +19,7 @@ const plans = [
     highlighted: true,
   },
   {
+    id: 'pro',
     name: 'Pro',
     price: '$24',
     period: '/month',
@@ -23,7 +29,7 @@ const plans = [
 ];
 
 const faqs = [
-  { q: 'Can I cancel anytime?', a: 'Yes, cancel whenever you like — no lock-in, no questions asked.' },
+  { q: 'Can I cancel anytime?', a: 'Yes, cancel whenever you like. No lock-in, no questions asked.' },
   { q: 'Do you offer refunds?', a: 'We offer a 14-day money-back guarantee on all paid plans.' },
   { q: 'Is the free plan really free?', a: 'Yes. No credit card required, no trial period, no catch.' },
 ];
@@ -31,56 +37,51 @@ const faqs = [
 export default function Pricing() {
   return (
     <>
-      <section style={styles.hero}>
-        <svg width="100%" height="100%" style={styles.stars}>
-          <circle cx="8%" cy="10%" r="1.1" fill="#fff" opacity="0.6" />
-          <circle cx="92%" cy="15%" r="1" fill="#fff" opacity="0.5" />
-          <circle cx="20%" cy="8%" r="0.8" fill="#fff" opacity="0.4" />
-        </svg>
-        <div style={styles.heroContent}>
-          <h1 style={styles.heroTitle}>Simple pricing</h1>
-          <p style={styles.heroSubtitle}>Start free. Upgrade when you're ready to go further.</p>
-        </div>
+      <section className="page-hero">
+        <StarField count={3} />
+        <h1 className="page-hero-title">Simple pricing</h1>
+        <p className="page-hero-subtitle">Start free. Upgrade when you're ready to go further.</p>
       </section>
 
-      <section style={styles.plansSection}>
-        <div style={styles.plansGrid}>
+      <section className="page-section">
+        <div className="plans-grid">
           {plans.map((plan) => (
             <div
-              key={plan.name}
+              key={plan.id}
               style={plan.highlighted ? { ...styles.planCard, ...styles.planCardHighlighted } : styles.planCard}
             >
               {plan.highlighted && <div style={styles.popularBadge}>Most popular</div>}
-              <div style={styles.planName}>{plan.name}</div>
+              <h2 style={styles.planName}>{plan.name}</h2>
               <div style={styles.planPriceRow}>
                 <span style={styles.planPrice}>{plan.price}</span>
                 <span style={styles.planPeriod}>{plan.period}</span>
               </div>
-              <div style={styles.featureList}>
+              <ul style={styles.featureList}>
                 {plan.features.map((f) => (
-                  <div key={f} style={styles.featureRow}>
-                    <i className="ti ti-check" style={styles.checkIcon}></i>
+                  <li key={f} style={styles.featureRow}>
+                    <i className="ti ti-check" style={styles.checkIcon} aria-hidden="true"></i>
                     <span>{f}</span>
-                  </div>
+                  </li>
                 ))}
-              </div>
-              <button
-                style={plan.highlighted ? { ...styles.planBtn, ...styles.planBtnHighlighted } : styles.planBtn}
+              </ul>
+              <Link
+                to={`/signup?plan=${plan.id}`}
+                className={`btn btn-block ${plan.highlighted ? 'btn-primary' : 'btn-secondary'}`}
               >
-                {plan.name === 'Free' ? 'Get started' : `Choose ${plan.name}`}
-              </button>
+                {plan.id === 'free' ? 'Get started' : `Choose ${plan.name}`}
+              </Link>
             </div>
           ))}
         </div>
       </section>
 
-      <section style={styles.faqSection}>
+      <section className="page-section">
         <div style={styles.faqContent}>
-          <div style={styles.faqTitle}>Common questions</div>
+          <h2 style={styles.faqTitle}>Common questions</h2>
           {faqs.map((faq) => (
             <div key={faq.q} style={styles.faqItem}>
-              <div style={styles.faqQ}>{faq.q}</div>
-              <div style={styles.faqA}>{faq.a}</div>
+              <h3 style={styles.faqQ}>{faq.q}</h3>
+              <p style={styles.faqA}>{faq.a}</p>
             </div>
           ))}
         </div>
@@ -90,45 +91,14 @@ export default function Pricing() {
 }
 
 const styles = {
-  hero: {
-    position: 'relative',
-    background: '#000',
-    padding: '70px 44px 40px',
-    overflow: 'hidden',
-    textAlign: 'center',
-  },
-  stars: { position: 'absolute', inset: 0 },
-  heroContent: { position: 'relative' },
-  heroTitle: {
-    color: '#fff',
-    fontSize: '32px',
-    fontWeight: '500',
-    fontFamily: 'var(--font-serif)',
-    marginBottom: '12px',
-  },
-  heroSubtitle: {
-    color: 'var(--color-text-secondary)',
-    fontSize: '14.5px',
-  },
-
-  plansSection: {
-    position: 'relative',
-    background: '#000',
-    padding: '20px 44px 80px',
-  },
-  plansGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(3, 1fr)',
-    gap: '20px',
-    maxWidth: '920px',
-    margin: '0 auto',
-  },
   planCard: {
     position: 'relative',
     background: 'rgba(255,255,255,0.04)',
     border: '1px solid rgba(255,255,255,0.1)',
     borderRadius: '20px',
     padding: '32px 26px',
+    display: 'flex',
+    flexDirection: 'column',
   },
   planCardHighlighted: {
     background: 'linear-gradient(160deg,#232066,#12102b)',
@@ -146,6 +116,7 @@ const styles = {
     fontWeight: '600',
     padding: '5px 14px',
     borderRadius: '999px',
+    whiteSpace: 'nowrap',
   },
   planName: {
     color: '#fff',
@@ -166,14 +137,16 @@ const styles = {
     fontFamily: 'var(--font-serif)',
   },
   planPeriod: {
-    color: '#8b86a0',
+    color: 'var(--color-text-faint)',
     fontSize: '13px',
   },
   featureList: {
+    listStyle: 'none',
     display: 'flex',
     flexDirection: 'column',
     gap: '12px',
     marginBottom: '28px',
+    flex: 1,
   },
   featureRow: {
     display: 'flex',
@@ -186,28 +159,6 @@ const styles = {
     fontSize: '15px',
     color: '#9fe1cb',
     flexShrink: 0,
-  },
-  planBtn: {
-    width: '100%',
-    background: 'rgba(255,255,255,0.06)',
-    color: '#e2e0ef',
-    border: '0.5px solid rgba(255,255,255,0.16)',
-    padding: '11px',
-    borderRadius: '9px',
-    fontSize: '13px',
-    fontWeight: '500',
-    cursor: 'pointer',
-  },
-  planBtnHighlighted: {
-    background: '#6c5fd6',
-    color: '#fff',
-    border: 'none',
-  },
-
-  faqSection: {
-    position: 'relative',
-    background: '#000',
-    padding: '20px 44px 80px',
   },
   faqContent: {
     maxWidth: '680px',
@@ -232,7 +183,7 @@ const styles = {
     marginBottom: '8px',
   },
   faqA: {
-    color: '#8b86a0',
+    color: 'var(--color-text-faint)',
     fontSize: '13px',
     lineHeight: '1.7',
   },

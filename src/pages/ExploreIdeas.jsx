@@ -1,4 +1,8 @@
 import { useState, useMemo } from 'react';
+import { Link } from 'react-router-dom';
+import StarField from '../components/StarField';
+
+const PAGE_SIZE = 6;
 
 const sectors = [
   'All',
@@ -13,6 +17,7 @@ const sectors = [
   'Automotive',
 ];
 
+// Temporary sample data. In Step 5 this comes from the database / AI.
 const ideas = [
   { title: 'Zero-waste refill store', sector: 'Sustainability', icon: 'ti-recycle', cost: '$1k–3k', gradient: 'linear-gradient(155deg,#639922 0%,#173404 70%,#000 100%)', tag: '#c0dd97' },
   { title: 'Online exam prep tutoring', sector: 'Education', icon: 'ti-school', cost: '$0–500', gradient: 'linear-gradient(155deg,#EF9F27 0%,#633806 70%,#000 100%)', tag: '#fac775' },
@@ -28,77 +33,99 @@ const ideas = [
 export default function ExploreIdeas() {
   const [search, setSearch] = useState('');
   const [activeSector, setActiveSector] = useState('All');
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
 
   const filteredIdeas = useMemo(() => {
+    const q = search.trim().toLowerCase();
     return ideas.filter((idea) => {
       const matchesSector = activeSector === 'All' || idea.sector === activeSector;
-      const matchesSearch = idea.title.toLowerCase().includes(search.toLowerCase());
+      const matchesSearch = !q || idea.title.toLowerCase().includes(q) || idea.sector.toLowerCase().includes(q);
       return matchesSector && matchesSearch;
     });
   }, [search, activeSector]);
 
+  const shown = filteredIdeas.slice(0, visibleCount);
+  const hasMore = filteredIdeas.length > visibleCount;
+
+  const changeSector = (sector) => {
+    setActiveSector(sector);
+    setVisibleCount(PAGE_SIZE);
+  };
+
   return (
     <>
-      <section style={styles.hero}>
-        <svg width="100%" height="100%" style={styles.stars}>
-          <circle cx="8%" cy="10%" r="1.1" fill="#fff" opacity="0.6" />
-          <circle cx="92%" cy="15%" r="1" fill="#fff" opacity="0.5" />
-          <circle cx="20%" cy="8%" r="0.8" fill="#fff" opacity="0.4" />
-          <circle cx="80%" cy="6%" r="0.9" fill="#fff" opacity="0.45" />
-        </svg>
-        <div style={styles.heroContent}>
-          <h1 style={styles.heroTitle}>Explore business ideas</h1>
-          <p style={styles.heroSubtitle}>
-            1000+ ideas across every sector you can think of, and some you can't yet.
-          </p>
-          <div style={styles.searchWrap}>
-            <i className="ti ti-search" style={styles.searchIcon}></i>
-            <input
-              placeholder="Search ideas..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              style={styles.searchInput}
-            />
-          </div>
+      <section className="page-hero" style={{ paddingBottom: '30px' }}>
+        <StarField count={4} />
+        <h1 className="page-hero-title">Explore business ideas</h1>
+        <p className="page-hero-subtitle" style={{ marginBottom: '26px' }}>
+          1000+ ideas across every sector you can think of, and some you can't yet.
+        </p>
+        <div style={styles.searchWrap} role="search">
+          <i className="ti ti-search" style={styles.searchIcon} aria-hidden="true"></i>
+          <label htmlFor="idea-search" className="sr-only">Search ideas</label>
+          <input
+            id="idea-search"
+            type="search"
+            placeholder="Search ideas..."
+            value={search}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              setVisibleCount(PAGE_SIZE);
+            }}
+            className="field-input"
+            style={{ paddingLeft: '42px', borderRadius: '12px' }}
+          />
         </div>
       </section>
 
       <section style={styles.filterSection}>
-        <div style={styles.filterRow}>
+        <div style={styles.filterRow} role="group" aria-label="Filter by sector">
           {sectors.map((sector) => (
-            <span
+            <button
               key={sector}
-              onClick={() => setActiveSector(sector)}
-              style={sector === activeSector ? styles.pillActive : styles.pill}
+              type="button"
+              className="pill"
+              onClick={() => changeSector(sector)}
+              aria-pressed={sector === activeSector}
             >
               {sector}
-            </span>
+            </button>
           ))}
         </div>
       </section>
 
-      <section style={styles.gridSection}>
+      <section className="page-section" style={{ paddingBottom: '70px' }}>
+        <p className="sr-only" aria-live="polite">{filteredIdeas.length} ideas found</p>
         {filteredIdeas.length === 0 ? (
-          <div style={styles.emptyState}>No ideas match your search yet — try another term or sector.</div>
+          <div style={styles.emptyState}>No ideas match your search yet. Try another term or sector.</div>
         ) : (
-          <div style={styles.grid}>
-            {filteredIdeas.map((idea) => (
-              <a key={idea.title} href="#" style={{ ...styles.card, background: idea.gradient }}>
-                <i className={`ti ${idea.icon}`} style={styles.cardIcon}></i>
-                <div style={styles.cardScrim}></div>
-                <div style={styles.costPill}>{idea.cost}</div>
-                <div style={styles.cardContent}>
-                  <span style={{ ...styles.cardTag, color: idea.tag }}>{idea.sector}</span>
-                  <div style={styles.cardTitle}>{idea.title}</div>
-                </div>
-              </a>
+          <ul className="ideas-grid" style={{ listStyle: 'none' }}>
+            {shown.map((idea) => (
+              <li key={idea.title}>
+                <Link
+                  to="/signup"
+                  className="media-card"
+                  style={{ height: '190px', background: idea.gradient }}
+                  aria-label={`${idea.title}, ${idea.sector}, startup cost ${idea.cost}. Sign up to see the full roadmap.`}
+                >
+                  <i className={`ti ${idea.icon}`} style={styles.cardIcon} aria-hidden="true"></i>
+                  <div style={styles.cardScrim}></div>
+                  <div style={styles.costPill}>{idea.cost}</div>
+                  <div style={styles.cardContent}>
+                    <span style={{ ...styles.cardTag, color: idea.tag }}>{idea.sector}</span>
+                    <div style={styles.cardTitle}>{idea.title}</div>
+                  </div>
+                </Link>
+              </li>
             ))}
-          </div>
+          </ul>
         )}
 
-        {filteredIdeas.length > 0 && (
+        {hasMore && (
           <div style={styles.loadMoreWrap}>
-            <button style={styles.loadMoreBtn}>Load more ideas</button>
+            <button type="button" className="btn btn-secondary" onClick={() => setVisibleCount((c) => c + PAGE_SIZE)}>
+              Load more ideas
+            </button>
           </div>
         )}
       </section>
@@ -107,28 +134,6 @@ export default function ExploreIdeas() {
 }
 
 const styles = {
-  hero: {
-    position: 'relative',
-    background: '#000',
-    padding: '70px 44px 30px',
-    overflow: 'hidden',
-    textAlign: 'center',
-  },
-  stars: { position: 'absolute', inset: 0 },
-  heroContent: { position: 'relative' },
-  heroTitle: {
-    color: '#fff',
-    fontSize: '32px',
-    fontWeight: '500',
-    fontFamily: 'var(--font-serif)',
-    marginBottom: '12px',
-  },
-  heroSubtitle: {
-    color: 'var(--color-text-secondary)',
-    fontSize: '14px',
-    maxWidth: '440px',
-    margin: '0 auto 26px',
-  },
   searchWrap: {
     maxWidth: '440px',
     margin: '0 auto',
@@ -140,25 +145,13 @@ const styles = {
     top: '50%',
     transform: 'translateY(-50%)',
     fontSize: '15px',
-    color: '#8b86a0',
+    color: 'var(--color-text-faint)',
+    zIndex: 1,
   },
-  searchInput: {
-    width: '100%',
-    background: 'rgba(255,255,255,0.05)',
-    border: '1px solid rgba(255,255,255,0.14)',
-    borderRadius: '12px',
-    padding: '12px 16px 12px 42px',
-    color: '#fff',
-    fontSize: '13px',
-    fontFamily: 'var(--font-sans)',
-    outline: 'none',
-    boxSizing: 'border-box',
-  },
-
   filterSection: {
     position: 'relative',
     background: '#000',
-    padding: '16px 44px 20px',
+    padding: '16px var(--page-x) 20px',
   },
   filterRow: {
     display: 'flex',
@@ -166,50 +159,11 @@ const styles = {
     flexWrap: 'wrap',
     justifyContent: 'center',
   },
-  pill: {
-    background: 'rgba(255,255,255,0.06)',
-    color: '#c9c5db',
-    border: '0.5px solid rgba(255,255,255,0.14)',
-    fontSize: '12px',
-    padding: '7px 16px',
-    borderRadius: '999px',
-    cursor: 'pointer',
-  },
-  pillActive: {
-    background: '#fff',
-    color: '#171334',
-    fontSize: '12px',
-    fontWeight: '600',
-    padding: '7px 16px',
-    borderRadius: '999px',
-    cursor: 'pointer',
-    border: 'none',
-  },
-
-  gridSection: {
-    position: 'relative',
-    background: '#000',
-    padding: '20px 44px 70px',
-  },
-  grid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(3, 1fr)',
-    gap: '16px',
-  },
   emptyState: {
     textAlign: 'center',
     color: 'var(--color-text-muted)',
     fontSize: '14px',
     padding: '60px 20px',
-  },
-  card: {
-    position: 'relative',
-    height: '190px',
-    borderRadius: '18px',
-    overflow: 'hidden',
-    textDecoration: 'none',
-    cursor: 'pointer',
-    display: 'block',
   },
   cardIcon: {
     position: 'absolute',
@@ -261,15 +215,5 @@ const styles = {
   loadMoreWrap: {
     textAlign: 'center',
     marginTop: '30px',
-  },
-  loadMoreBtn: {
-    background: 'rgba(255,255,255,0.06)',
-    color: '#e2e0ef',
-    border: '0.5px solid rgba(255,255,255,0.16)',
-    padding: '11px 26px',
-    borderRadius: '9px',
-    fontSize: '13px',
-    fontWeight: '500',
-    cursor: 'pointer',
   },
 };

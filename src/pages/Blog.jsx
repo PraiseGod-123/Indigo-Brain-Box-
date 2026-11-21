@@ -1,3 +1,7 @@
+import StarField from '../components/StarField';
+
+// Articles aren't written yet, so cards show "Coming soon" instead of linking nowhere.
+// When a post is ready, give it a `slug` and turn the card into a <Link to={`/blog/${slug}`}>.
 const posts = [
   {
     title: 'Too many interests, no idea where to start?',
@@ -43,45 +47,26 @@ export default function Blog() {
 
   return (
     <>
-      <section style={styles.hero}>
-        <svg width="100%" height="100%" style={styles.stars}>
-          <circle cx="6%" cy="8%" r="1.2" fill="#fff" opacity="0.7" />
-          <circle cx="18%" cy="4%" r="1" fill="#fff" opacity="0.55" />
-          <circle cx="32%" cy="10%" r="1.1" fill="#fff" opacity="0.6" />
-          <circle cx="48%" cy="3%" r="0.9" fill="#fff" opacity="0.5" />
-          <circle cx="64%" cy="8%" r="1.2" fill="#fff" opacity="0.65" />
-          <circle cx="80%" cy="5%" r="1" fill="#fff" opacity="0.55" />
-          <circle cx="92%" cy="12%" r="1.1" fill="#fff" opacity="0.6" />
-          <circle cx="10%" cy="22%" r="0.8" fill="#fff" opacity="0.4" />
-          <circle cx="88%" cy="20%" r="1" fill="#fff" opacity="0.5" />
-          <circle cx="4%" cy="40%" r="0.9" fill="#fff" opacity="0.4" />
-          <circle cx="95%" cy="42%" r="1" fill="#fff" opacity="0.5" />
-          <circle cx="15%" cy="60%" r="0.9" fill="#fff" opacity="0.4" />
-          <circle cx="85%" cy="62%" r="1" fill="#fff" opacity="0.5" />
-          <circle cx="30%" cy="80%" r="0.9" fill="#fff" opacity="0.4" />
-          <circle cx="70%" cy="82%" r="1" fill="#fff" opacity="0.45" />
-          <circle cx="50%" cy="92%" r="0.9" fill="#fff" opacity="0.4" />
-        </svg>
-        <div style={styles.heroContent}>
-          <h1 style={styles.heroTitle}>The blog</h1>
-          <p style={styles.heroSubtitle}>Ideas worth reading before you start.</p>
-        </div>
+      <section className="page-hero" style={{ textAlign: 'left' }}>
+        <StarField count={16} brightness={1.15} />
+        <h1 className="page-hero-title">The blog</h1>
+        <p className="page-hero-subtitle" style={{ margin: 0 }}>Ideas worth reading before you start.</p>
       </section>
 
-      <section style={styles.gridSection}>
-        <div style={styles.grid}>
+      <section className="page-section" style={{ paddingBottom: '70px' }}>
+        <div className="blog-grid">
           {large.map((post) => (
-            <PostCard key={post.title} post={post} style={styles.largeCard} />
+            <PostCard key={post.title} post={post} className="blog-large" height={420} />
           ))}
 
           <div style={styles.smallStack}>
             {small.map((post) => (
-              <PostCard key={post.title} post={post} style={styles.smallCard} />
+              <PostCard key={post.title} post={post} height={195} />
             ))}
           </div>
 
           {medium.map((post) => (
-            <PostCard key={post.title} post={post} style={styles.mediumCard} />
+            <PostCard key={post.title} post={post} height={230} />
           ))}
         </div>
       </section>
@@ -89,79 +74,25 @@ export default function Blog() {
   );
 }
 
-function PostCard({ post, style }) {
+function PostCard({ post, height, className = '' }) {
   return (
-    <a href="#" style={{ ...styles.card, ...style, background: post.gradient }}>
-      <i className={`ti ${post.icon}`} style={styles.cardIcon}></i>
+    <article className={`media-card ${className}`} style={{ height: `${height}px`, background: post.gradient }}>
+      <i className={`ti ${post.icon}`} style={styles.cardIcon} aria-hidden="true"></i>
       <div style={styles.cardScrim}></div>
+      <div style={styles.soonPill}>Coming soon</div>
       <div style={styles.cardContent}>
         <span style={styles.cardTag}>{post.category}</span>
-        <div style={styles.cardTitle}>{post.title}</div>
+        <h2 style={styles.cardTitle}>{post.title}</h2>
       </div>
-    </a>
+    </article>
   );
 }
 
 const styles = {
-  hero: {
-    position: 'relative',
-    background: '#000',
-    padding: '70px 44px 40px',
-    overflow: 'hidden',
-  },
-  stars: {
-    position: 'absolute',
-    inset: 0,
-  },
-  heroContent: {
-    position: 'relative',
-  },
-  heroTitle: {
-    color: '#fff',
-    fontSize: '32px',
-    fontWeight: '500',
-    fontFamily: 'var(--font-serif)',
-    marginBottom: '8px',
-  },
-  heroSubtitle: {
-    color: 'var(--color-text-secondary)',
-    fontSize: '14px',
-  },
-
-  gridSection: {
-    position: 'relative',
-    background: '#000',
-    padding: '20px 44px 70px',
-  },
-  grid: {
-    display: 'grid',
-    gridTemplateColumns: '1.4fr 1fr',
-    gap: '18px',
-  },
   smallStack: {
     display: 'flex',
     flexDirection: 'column',
     gap: '18px',
-  },
-
-  card: {
-    position: 'relative',
-    borderRadius: '20px',
-    overflow: 'hidden',
-    textDecoration: 'none',
-    cursor: 'pointer',
-    display: 'block',
-  },
-  largeCard: {
-    height: '420px',
-    gridColumn: '1',
-    gridRow: '1',
-  },
-  smallCard: {
-    height: '195px',
-  },
-  mediumCard: {
-    height: '230px',
   },
   cardIcon: {
     position: 'absolute',
@@ -175,6 +106,18 @@ const styles = {
     position: 'absolute',
     inset: 0,
     background: 'linear-gradient(0deg, rgba(0,0,0,0.85) 0%, transparent 70%)',
+  },
+  soonPill: {
+    position: 'absolute',
+    top: '18px',
+    right: '18px',
+    background: 'rgba(0,0,0,0.35)',
+    border: '1px solid rgba(255,255,255,0.2)',
+    color: '#fff',
+    fontSize: '10.5px',
+    fontWeight: '600',
+    padding: '4px 10px',
+    borderRadius: '999px',
   },
   cardContent: {
     position: 'absolute',
